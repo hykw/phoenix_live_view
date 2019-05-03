@@ -1,28 +1,23 @@
 defmodule Phoenix.LiveView do
   @moduledoc """
-  LiveView provides rich, real-time user experiences with
-  server-rendered HTML.
+  LiveView はサーバ側でHTMLをレンダリングすることによる、リッチでリアルタイムな
+  ユーザエクスペリエンスを提供します。
 
-  LiveView programming model is declarative: instead of
-  saying "once event X happens, change Y on the page",
-  events in LiveView are regular messages which may cause
-  changes to its state. Once the state changes, LiveView will
-  re-render the relevant parts of its HTML template and push it
-  to the browser, which updates itself in the most efficient
-  manner. This means developers write LiveView templates as
-  any other server-rendered HTML and LiveView does the hard
-  work of tracking changes and sending the relevant diffs to
-  the browser.
+  LiveView のプログラミングモデルは宣言的です：「イベントXが発生したら、ページの
+  Yを変更する」という指定ではなく、LiveView のイベントは状態の変更を行う普通の
+  メッセージです。状態が変更されたら、LiveView はHTML テンプレートの関連する部分
+  を再レンダリングし、ブラウザにその変更を戻します。ブラウザは最も効率の良い方法
+  で自身を更新します。開発者は LiveView のテンプレートを他のサーバ側でレンダリング
+  されるHTMLと同じように書くことができ、変更の追従やブラウザに変更点を送るといった
+  難しい部分は LiveView が処理してくれます。
 
-  At the end of the day, a LiveView is nothing more than a
-  process, that receives events as messages and updates its
-  state. The state itself is nothing more than functional
-  and immutable Elixir data structures. The events are either
-  internal application messages (usually emitted by `Phoenix.PubSub`)
-  or sent by the client/browser.
+  結局の所、LiveView はイベントをメッセージとして受信し、その状態を更新する１つの
+  プロセスにすぎません。状態それ自体は、関数型でイミュータブルな Elixir のデータ
+  構造に他なりません。イベントは（通常 `Phoenix.PubSub` により発行される）アプリ
+  ケーション内部のメッセージか、あるいはクライアント・ブラウザから送られます。
 
-  LiveView provides many features that make it excellent
-  to build rich, real-time user experiences:
+  LiveView はリッチでリアルタイムなユーザエクスペリエンスの構築を優れたものにする、
+  多くの機能を提供します。
 
     * By building on top of Elixir processes and
       `Phoenix.Channels`, LiveView scales well vertically
