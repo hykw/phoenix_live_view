@@ -19,51 +19,43 @@ defmodule Phoenix.LiveView do
   LiveView はリッチでリアルタイムなユーザエクスペリエンスの構築を優れたものにする、
   多くの機能を提供します。
 
-    * By building on top of Elixir processes and
-      `Phoenix.Channels`, LiveView scales well vertically
-      (from small to large instances) and horizontally
-      (by adding more instances);
+    * Elixir プロセスや `Phoenix.Channels` で構築することにより、LiveView は
+    垂直報告（小さいインスタンスから大きいインスタンスへ）や水平方向（インスタンス
+    を追加）にスケールできます
 
-    * LiveView is first rendered statically as part of
-      regular HTTP requests, which provides quick times
-      for "First Meaningful Paint" and also help search
-      and indexing engines;
+    * LiveView は最初に、普通の HTTP リクエストの一部として静的にレンダリングされます。
+    これにより、"First Meaningful Paint（意味がある表示が行われたタイミング）を
+    迅速に提供でき、また検索エンジンの検索やインデックスの助けとなります。
 
-    * LiveView performs diff tracking. If the LiveView
-      state changes, it won't re-render the whole template,
-      but only the parts affected by the changed state.
-      This reduces latency and the amount of data sent over
-      the wire;
+    * LiveView は差分のトラッキングを行います。LiveView の状態が変更された時には、
+    テンプレート全体を再度レンダリングしようとするのではなく、変更された状態の
+    影響を受ける部分だけをレンダリングします。これにより、レイテンシやネットワーク
+    上のデータ転送量を削減します。
 
-    * LiveView tracks static and dynamic contents. Any
-      server-rendered HTML is made of static parts (i.e.
-      that never change) and dynamic ones. On the first
-      render, LiveView sends the static contents and in
-      future updates only the modified dynamic contents
-      are resent;
+    * LiveView は静的・動的コンテンツをトラッキングします。サーバー上でレンダリング
+    されるHTMLは静的（つまり変更されない）と動的な部品で構成されています。最初の
+    レンダリング時に、LiveView は静的なコンテンツを返し、更新時には変更された動的
+    なコンテンツだけが再送されます。
 
-    * (Coming soon) LiveView uses the Erlang Term Format
-      to send messages to the client. This binary-based
-      format is quite efficient on the server and uses
-      less data over the wire;
+    * （近日公開）LiveView はクライアントにメッセージを送るのに Erlang Term Format
+    を使用します。このバイナリーフォーマットはサーバー上で非常に効率がよく、回線
+    を流れるデータも小さいです。
 
-    * (Coming soon) LiveView includes a latency simulator,
-      which allows you to simulate how your application
-      behaves on increased latency and guides you to provide
-      meaningful feedback to users while they wait for events
-      to be processed;
+    * （近日公開）LiveView は遅延シミュレータが含まれています。これにより、遅延の
+    大きい環境でアプリケーションがどのように振る舞うのかをシミュレートすることが
+    でき、イベントが処理されるのを待っている間に、ユーザに意味のあるフィードバック
+    を提供するためのガイドとなります。
 
-  Furthermore, by keeping a persistent connection between client
-  and server, LiveView applications can react faster to user events
-  as there is less work to be done and less data to be sent compared
-  to stateless requests that have to authenticate, decode, load,
-  and encode data on every request. The flipside is that LiveView
-  uses more memory on the server compared to stateless requests.
+    さらに、クライアントとサーバ間のコネクションを貼り続けることで、LiveView の
+    アプリケーションはユーザのイベントにより早く応答することができます。なぜなら
+    やらなければならないとは少なく、また送信するデータも少ないからです（ステート
+    レスなリクエストと比較した場合。それらの場合、認証、デコード、データ読み込み、
+    エンコードをリエクストごと行わないといけない）。一方で、LiveView はステート
+    レスなリクエストと比較して、サーバ側でより多くのメモリを必要とします。
 
-  ## Use cases
+  ## ユースケース
 
-  There are many use cases where LiveView is an excellent
-  fit right now:
+  既に、LiveView がとてもよく適合する多くのユースケースがあります。
 
     * Handling of user interaction and inputs, buttons, and
       forms - such as input validation, dynamic forms,
