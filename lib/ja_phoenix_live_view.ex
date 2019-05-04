@@ -57,28 +57,23 @@ defmodule Phoenix.LiveView do
 
   既に、LiveView がとてもよく適合する多くのユースケースがあります。
 
-    * Handling of user interaction and inputs, buttons, and
-      forms - such as input validation, dynamic forms,
-      autocomplete, etc;
+    * ユーザとのやりとりや input, button, form などの取扱い（入力のバリデーション、
+    フォームの動的生成、自動補完など）
 
-    * Events and updates pushed by server - such as
-      notifications, dashboards, etc;
+    * サーバからイベントやアップデートのプッシュ（通知やダッシュボードなど）
 
-  There are other cases that have limited support but
-  will become first-class as we further develop LiveView:
+  いまは限定的なサポートですが、今後の LiveView の開発に伴い、素晴らしいものに
+  なるユースケース
 
-    * Page and data navigation - such as navigating between
-      pages, pagination, etc can be built with LiveView
-      but currently you will lose the back/forward button,
-      and the ability to link to pages as you navigate.
-      Support for `pushState` is on the roadmap;
+    * ページやデータのナビゲーション（ページネーションやページの切り替えなど）は
+    LiveView で実現することはできますが、現在は進む・戻るボタンが無く、ナビゲー
+    ション間でページ同士をリンクする機能はありません。`pushState` のサポートは
+    計画中です。
 
-    * Cumulative and always growing data - chat
-      applications, logs, and similar can be built with
-      LiveView but currently you have to keep in the
-      server a copy of all messages shown in the client
-      as there is no append/prepend operation. Support
-      for append/prepend is on the roadmap;
+    * 累積・増え続けていくデータ（チャットアプリ、ログなど）を LiveView で扱うことは
+    できますが、追加などの処理を行う機能が無いため、クライアントに送られるメッセージの
+    全コピーをサーバ上で保持する必要があります。後ろ・前にデータを追加していく機能
+    は計画中です。
 
     * Transitions and loading states - the LiveView
       programming model provides a good foundation for
