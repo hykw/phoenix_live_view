@@ -75,6 +75,8 @@ defmodule Phoenix.LiveView do
     全コピーをサーバ上で保持する必要があります。後ろ・前にデータを追加していく機能
     は計画中です。
 
+********************** FIXME: 面倒くさいので、メモ程度に訳す
+
     * Transitions and loading states - the LiveView
       programming model provides a good foundation for
       transitions and loading states since any UI change
@@ -102,7 +104,7 @@ defmodule Phoenix.LiveView do
       Optimistic UIs cannot be achieved without also writing
       JavaScript for the cases the server is not available;
 
-  ## Life-cycle
+  ## ライフサイクル
 
   A LiveView begins as a regular HTTP request and HTML response,
   and then upgrades to a stateful view on client connect,
@@ -121,6 +123,13 @@ defmodule Phoenix.LiveView do
   the view. After mounting, `render/1` is invoked and the HTML is sent
   as a regular HTML response to the client.
 
+  LiveView のレンダリングは router/controller からはじまり、view に"session" データを送る。
+  view で必要なリクエスト情報がそこに入っている（param, cookie session info とか）
+  セッションは sign されてクライアントに保持される。クライアントがコネクト・再コネクトしたらサーバに返される。
+  view がコントローラからrenderされたら、`mount/2` が呼ばれる（セッションデータや LiveView socket とと共に）
+  `mount/2` は view のレンダリングに必要な socket の assisn する
+  mount のあと、`render/1` が呼ばれて、クライアントに普通の HTML が返る
+
   After rendering the static page with a signed session, LiveView
   connects from the client where stateful views are spawned
   to push rendered updates to the browser, and receive client events
@@ -134,7 +143,12 @@ defmodule Phoenix.LiveView do
   gracefully reconnects to the server, passing its signed session
   back to `mount/2`.
 
-  ## Example
+  signed session で静的ページがレンダーされたら、LiveView はクライアントから接続されて、stateful な view が spawn される（ブラウザに更新を送るのに使われる）。phx バインディングから、クライアントのイベントを取得する
+  コントローラのフローと同様に、`mount/2` が signed session, socket state と一緒に呼び出される。mount はレンダーに必要な値を assign する。クライアントと接続されてる場合、LiveView プロセスは spawn されて、`render/1` の結果がクライアントにプッシュされる。これがコネクションがある間継続する。
+  ステートレスなライフサイクルがどっかでクラッシュした場合、あるいはクライアントとの接続が切れた場合、クライアントは gracefully にサーバに再接続して、signed session を `mount/2` にまた送る
+
+
+  ## 例
 
   First, a LiveView requires two callbacks: `mount/2` and `render/1`:
 
@@ -163,9 +177,16 @@ defmodule Phoenix.LiveView do
   to inline LiveView templates. If you want to use `Phoenix.HTML` helpers,
   remember to `use Phoenix.HTML` at the top of your `LiveView`.
 
+  `render/1` は `socket.assigns` を引数でもらって、レンダリングされたコンテンツを返す役目
+  `Phoenix.LiveView.sigil_L/2`（つまり`~L`）でインラインで書くこともできる
+  `Phoenix.HTML`ヘルパを使いたいなら、`use Phoenix.HTML` を追加すればいい
+
+
   A separate `.leex` HTML template can also be rendered within
   your `render/1` callback by delegating to an existing `Phoenix.View`
   module in your application. For example:
+
+  `.leex` ファイルにテンプレートを外出して、`render/1` は `Phoenix.View` に処理を任すこともできる
 
       defmodule AppWeb.ThermostatLive do
         use Phoenix.LiveView
@@ -334,14 +355,22 @@ defmodule Phoenix.LiveView do
   `value` passed to `handle_event` is chosen on the client with the following
   priority:
 
+  `phx-click` バインディングで、サーバにクリックイベントを送れる。`handle_event` に送られる `value` は、以下の優先順位で決まる
+
     * An optional `"phx-value"` binding on the clicked element
     * The clicked element's `value` property
     * An empty string
 
-  ### Focus and Blur Events
+    * `phx-value` の値
+    * クリックされた要素の `value` の値
+    * 空文字列
+
+  ### Focus や Blue イベント
 
   Focus and blur events may be bound to DOM elements that emit
   such events, using the `phx-blur`, and `phx-focus` bindings, for example:
+
+  `phx-blur` や `phx-focus` バインディングで。
 
       <input name="email" phx-focus="myfocus" phx-blur="myblur"/>
 
@@ -350,6 +379,9 @@ defmodule Phoenix.LiveView do
   bindings, a `phx-value` can be provided on the bound element,
   otherwise the input's value will be used. For example:
 
+  ページ自身の focus/blur は `phx-target` に `"window"` をセットする
+  他のバインディングと同様に `phx-value` を指定できる。指定しない場合は、input の value が使われる
+
       <div class="container"
           phx-focus="page-active"
           phx-blur="page-inactive"
@@ -357,13 +389,18 @@ defmodule Phoenix.LiveView do
         ...
       </div>
 
-  ### Form Events
+  ### Form イベント
 
   To handle form changes and submissions, use the `phx-change` and `phx-submit`
   events. In general, it is preferred to handle input changes at the form level,
   where all form fields are passed to the LiveView's callback given any
   single input change. For example, to handle real-time form validation and
   saving, your template would use both `phx_change` and `phx_submit` bindings:
+
+  フォームの変更や submit は `phx-change` や `phx-submit` イベントを使う
+  input の変更を扱うときはフォームのレベルでやるのが好まれる
+  その場合、フォームの全フィールドの値の変更は LiveViewのコールバックに送られる（どの input の値を変更しても、一元管理できる）
+  リアルタイムの validation やセーブを扱う場合、`phx_change` と `phx_submit` バインディングを使う
 
       <%= form_for @changeset, "#", [phx_change: :validate, phx_submit: :save], fn f -> %>
         <%= label f, :username %>
@@ -412,11 +449,16 @@ defmodule Phoenix.LiveView do
   changes, such as generating new errors, `render/1` is invoked and
   the form is re-rendered.
 
+  validate コールバックは、form の全 input の値で changeset を更新して、新しい changesetを socket に assign する
+  changeset が更新されると（新しいエラーが生成された、とか）、`render/1` が呼び出されて、フォームが再レンダーされる
+
   Likewise for `phx-submit` bindings, the save callback is invoked and
   persistence is attempted. On success, a `:stop` tuple is returned and the
   socket is annotated for redirect with `Phoenix.LiveView.redirect/2`,
   otherwise the socket assigns are updated with the errored changeset to be
   re-rerendered for the client.
+
+  `phx-submit` の場合、save がよばれる。
 
   *Note*: For proper form error tag updates, the error tag must specify which
   input it belongs to. This is accomplished with the `data-phx-error-for` attribute.
@@ -431,7 +473,7 @@ defmodule Phoenix.LiveView do
         end)
       end
 
-  ### Key Events
+  ### キーイベント
 
   The onkeydown, and onkeyup events are supported via
   the `phx-keydown`, and `phx-keyup` bindings. When
@@ -439,6 +481,9 @@ defmodule Phoenix.LiveView do
   By default, the bound element will be the event listener, but an
   optional `phx-target` may be provided which may be `"document"`,
   `"window"`, or the DOM id of a target element, for example:
+
+  key up/down は `phx-keydown` や `phx-keyup` バインディングで
+  このときの value は押したキーのコード
 
       @up_key 38
       @down_key 40
